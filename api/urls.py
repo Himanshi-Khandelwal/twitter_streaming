@@ -1,7 +1,7 @@
-from django.urls import path, include, re_path
+from django.conf.urls import url, include
 from api import views
 
 urlpatterns = [
-    path('tasks/', views.task_list, name='task_list'),
-    re_path(r'^tasks-filter/', views.task_filter, name='task_filter'),
+    url('tasks/', views.TaskViewSet.as_view({"get": "list"}), name='task_list'),
+    url(r'^tasks-filter/', views.task_filter, name='task_filter'),
 ]

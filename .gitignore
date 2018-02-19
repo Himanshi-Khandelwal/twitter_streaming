@@ -106,3 +106,4 @@ venv.bak/
 __pycache__
 .env/
 db.sqlite3
+django-mongoadmin

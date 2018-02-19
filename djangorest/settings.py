@@ -11,11 +11,12 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
-import twitter
-import pymongo
-from pymongo import MongoClient
-
+# import pymongo
+# from pymongo import MongoClient
+import mongoengine
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import tweepy
+from tweepy import OAuthHandler
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -41,8 +42,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_mongoengine',
     'api',
+    'mongoengine.django.mongo_auth',
 ]
+MONGOADMIN_OVERRIDE_ADMIN = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -74,34 +78,63 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'djangorest.wsgi.application'
 
-consumer_key = 'Enter'
-consumer_secret = 'Enter'
-access_token = 'Enter'
-access_token_secret = 'Enter'
+consumer_key = 'Cu85P1mfYUULhYr3GXYicIsaF'
+consumer_secret = '5Ni0Onrl6kD5Vzbw18pdQOWG9oHN2LU3MY8k4fsbaSzAoDl1x5'
+access_token = '730266246113988608-temclGmgYJIChkL6ZK36NtqMng0y28W'
+access_token_secret = 'y6DoCvWXwzix4lCPDABfvGiMjCuH8EXHfZn2riNJI3jJy'
+
+auth = OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
 }
 
-auth = twitter.oauth.OAuth(access_token, access_token_secret,consumer_key, consumer_secret)
 
-twitter_api = twitter.Twitter(auth=auth)
 
-client = MongoClient()
-db = client.tweet_db
-tweet_collection = db.tweet_collection
-tweet_collection.create_index([("id", pymongo.ASCENDING)],unique = True)
+# twitter_api = twitter.Twitter(auth=auth)
+#
+# client = MongoClient()
+# db = client.tweet_db
+# tweet_collection = db.tweet_collection
+# tweet_collection.create_index([("id", pymongo.ASCENDING)],unique = True)
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': '',
     }
 }
 
+SESSION_ENGINE = 'mongoengine.django.sessions'
+
+_MONGODB_USER = 'himanshi'
+_MONGODB_PASSWD = 'himanshi'
+_MONGODB_HOST = 'localhost'
+_MONGODB_NAME = 'thedbs'
+MONGO_PORT = 27017
+_MONGODB_DATABASE_HOST = \
+    'mongodb://%s:%s@%s/%s' \
+    % (_MONGODB_USER, _MONGODB_PASSWD, _MONGODB_HOST, _MONGODB_NAME)
+
+# mongoengine.connect(_MONGODB_NAME, host=_MONGODB_DATABASE_HOST)
+mongoengine.connect(_MONGODB_NAME, host=_MONGODB_HOST, port=MONGO_PORT)
+
+AUTHENTICATION_BACKENDS = (
+    'mongoengine.django.auth.MongoEngineBackend',
+)
+
+AUTH_USER_MODEL = 'mongo_auth.MongoUser'
+MONGOENGINE_USER_DOCUMENT = 'mongoengine.django.auth.User'
+
+SESSION_ENGINE = 'mongoengine.django.sessions'
+SESSION_SERIALIZER = 'mongoengine.django.sessions.BSONSerializer'
+
+DEFAULT_AUTHENTICATION_CLASSES = (
+    'rest_framework.authentication.SessionAuthentication',
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
