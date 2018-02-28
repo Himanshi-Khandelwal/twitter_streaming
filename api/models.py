@@ -14,17 +14,20 @@ from mongoengine import Document, EmbeddedDocument, fields
 class Task(Document):
     search = fields.StringField()
     count = fields.IntField()
-    # created = fields.DateTimeField(default=datetime.datetime.now)
-
+    
 class Users(Document):
-	user_id = fields.StringField()
+	use_id = fields.IntField()
 	name = fields.StringField()
 	friend_count = fields.IntField()
+	screen_name = fields.StringField()
+	location = fields.StringField()
 
 class Tweet(Document):
-	tweet_id = fields.ReferenceField(Users, dbref=True)
-	created_at = fields.DateTimeField(default=datetime.datetime.now)
-	screen_name = fields.StringField()
-	user_name = fields.StringField()
-	location = fields.StringField()
+	user_id = fields.ReferenceField(Users, dbref=True)
+	tweetedOn = fields.DateTimeField(default=datetime.datetime.now)
+	hashtags = fields.ListField()
+	lang = fields.StringField()
+	retweet_count = fields.IntField()
 	text = fields.StringField()
+
+	# meta = {'allow_inheritance': True}
