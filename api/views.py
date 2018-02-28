@@ -39,7 +39,7 @@ def saveData(data, keyword):
                 location = data['user']['location'],
         )
     tool = Tweet.objects.create(
-            user_id = x,
+            user = x,
             tweetedOn = datetime.strptime(data['created_at'], '%a %b %d %H:%M:%S +0000 %Y'),
             hashtags  = [x['text'] for x in data['entities']['hashtags']],
             lang = data['lang'],
@@ -47,7 +47,7 @@ def saveData(data, keyword):
             text = data['text']
         )
 
-def filter_resp(data,queryset_list):
+def filter_resp(data,queryset_list,user_queryset_list):
     result={}
     if data:
             if(data.get('filters')!=None):
@@ -105,9 +105,10 @@ def filter_resp(data,queryset_list):
             for x in queryset_list:
                 result[i]={}
                 result[i]['language']=x.lang
+                result[i]['name']=x.user.name
+                result[i]['hashtags']=x.hashtags
                 result[i]['tweetedOn']=x.tweetedOn
                 result[i]['text']=x.text
-                result[i]['retweet_count']=x.retweet_count
                 i=i+1
     return (result)
 
@@ -139,9 +140,10 @@ class TaskFilterSet(views.APIView):
     def post(self, request):
         paginate_by=10
         queryset_list = Tweet.objects.all()
+        user_queryset_list = Users.objects.all()
         data = request.data
         result={}
-        result = filter_resp(data,queryset_list)
+        result = filter_resp(data,queryset_list,user_queryset_list)
 
         if result:
             paginator = PageNumberPagination()
@@ -151,15 +153,16 @@ class TaskFilterSet(views.APIView):
 
         else:
             return Response(
-                "Error", status=status.HTTP_400_BAD_REQUEST)
+                "No results according to your query", status=status.HTTP_400_BAD_REQUEST)
 
 
 
 class GetCSV(views.APIView):
     def post(self, request):
         queryset_list = Tweet.objects.all()
+        user_queryset_list = Users.objects.all()
         data = request.data
-        result = filter_resp(data,queryset_list)
+        result = filter_resp(data,queryset_list,user_queryset_list)
         if result:
             df = pd.DataFrame.from_dict(result,orient="index")
             df.to_csv('results.csv')

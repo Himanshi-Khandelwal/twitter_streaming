@@ -14,7 +14,7 @@ from mongoengine import Document, EmbeddedDocument, fields
 class Task(Document):
     search = fields.StringField()
     count = fields.IntField()
-    
+
 class Users(Document):
 	use_id = fields.IntField()
 	name = fields.StringField()
@@ -23,7 +23,7 @@ class Users(Document):
 	location = fields.StringField()
 
 class Tweet(Document):
-	user_id = fields.ReferenceField(Users, dbref=True)
+	user = fields.ReferenceField(Users, dbref=True)
 	tweetedOn = fields.DateTimeField(default=datetime.datetime.now)
 	hashtags = fields.ListField()
 	lang = fields.StringField()
