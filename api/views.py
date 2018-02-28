@@ -8,7 +8,7 @@ from rest_framework.pagination import PageNumberPagination
 from api.models import Task, Tweet, Users
 from api.serializers import TaskSerializer, TweetSerializer, UserSerializer
 from tweepy.streaming import StreamListener
-from tweepy import Stream, OAuthHandler 
+from tweepy import Stream, OAuthHandler
 from rest_framework import views,serializers
 from datetime import datetime
 from djangorest.settings import auth
@@ -20,7 +20,7 @@ class TaskViewSet(views.APIView):
         serializer = TaskSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        l = StdOutListener(serializer.data['count'], serializer.data['search'])   
+        l = StdOutListener(serializer.data['count'], serializer.data['search'])
         stream = Stream(auth, l)
         stream.filter(track=serializer.data['search'])
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -29,7 +29,7 @@ class TaskViewSet(views.APIView):
 def saveData(data, keyword):
     try:
         x = Users.objects.get(use_id=data['user']['id'])
-        
+
     except Users.DoesNotExist:
         x = Users.objects.create(
                 use_id = data['user']['id'],
@@ -37,7 +37,7 @@ def saveData(data, keyword):
                 friend_count = data['user']['friends_count'],
                 screen_name = data['user']['screen_name'],
                 location = data['user']['location'],
-        ) 
+        )
     tool = Tweet.objects.create(
             user_id = x,
             tweetedOn = datetime.strptime(data['created_at'], '%a %b %d %H:%M:%S +0000 %Y'),
@@ -50,14 +50,14 @@ def saveData(data, keyword):
 def filter_resp(data,queryset_list):
     result={}
     if data:
-            if(data.get('filters')!=None):               
+            if(data.get('filters')!=None):
                 for x in data['filters']:
                     if(x['operand']=='language'):
-                        queryset_list = queryset_list.filter(lang = x['value'])                        
+                        queryset_list = queryset_list.filter(lang = x['value'])
 
                     if(x['operand']=='retweet_count'):
                         if(x['operator']=='gte'):
-                            queryset_list = queryset_list.filter(retweet_count__gte = x['value'])                        
+                            queryset_list = queryset_list.filter(retweet_count__gte = x['value'])
                         elif(x['operator']=='gt'):
                             queryset_list = queryset_list.filter(retweet_count__gt = x['value'])
                         elif(x['operator']=='lte'):
@@ -84,7 +84,7 @@ def filter_resp(data,queryset_list):
 
             if(data.get('searchTerm')!=None):
                 queryset_list = queryset_list.filter(text__icontains = data['searchTerm'])
-                 
+
 
             if(data.get('sort')!=None):
                 for x in data['sort']:
@@ -93,14 +93,14 @@ def filter_resp(data,queryset_list):
                             queryset_list = queryset_list.order_by('-retweet_count')
                         if(x['retweet_count']=="asc"):
                             queryset_list = queryset_list.order_by('retweet_count')
-                    
+
                     if(x.get('text')!=None):
                         if(x['text']=="asc"):
                             queryset_list = queryset_list.order_by('text')
                         if(x['text']=="desc"):
                             queryset_list = queryset_list.order_by('-text')
-             
-            
+
+
             i=1
             for x in queryset_list:
                 result[i]={}
@@ -123,7 +123,7 @@ class StdOutListener(StreamListener):
         data = json.loads(data)
         saveData(data, self.keyword)
         self.tweetcount+=1
-        
+
         if self.max_count and self.tweetcount >= self.max_count:
             return (False)
 
@@ -143,8 +143,8 @@ class TaskFilterSet(views.APIView):
         data = request.data
         result={}
         result = filter_resp(data,queryset_list)
-        
-        if result:        
+
+        if result:
             paginator = PageNumberPagination()
             paginator.page_size = 4
             result_page = paginator.paginate_queryset(queryset_list, request)

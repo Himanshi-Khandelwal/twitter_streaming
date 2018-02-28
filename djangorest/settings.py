@@ -78,10 +78,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'djangorest.wsgi.application'
 
-consumer_key = 'Cu85P1mfYUULhYr3GXYicIsaF'
-consumer_secret = '5Ni0Onrl6kD5Vzbw18pdQOWG9oHN2LU3MY8k4fsbaSzAoDl1x5'
-access_token = '730266246113988608-temclGmgYJIChkL6ZK36NtqMng0y28W'
-access_token_secret = 'y6DoCvWXwzix4lCPDABfvGiMjCuH8EXHfZn2riNJI3jJy'
+consumer_key = 'Enter'
+consumer_secret = 'Enter'
+access_token = 'Enter'
+access_token_secret = 'Enter'
 
 auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
