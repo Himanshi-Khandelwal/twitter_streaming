@@ -134,7 +134,6 @@ class StdOutListener(StreamListener):
 
 
 class TaskFilterSet(views.APIView):
-    paginate_by=10
     # pagination_class=LimitOffsetPagination
 
     def post(self, request):
